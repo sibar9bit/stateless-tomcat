@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.0.0.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.4.RELEASE'
+    id "com.palantir.docker" version "0.19.2"
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.session:spring-session-jdbc'
+    compile 'org.springframework.boot:spring-boot-starter-jdbc'
+    compile 'mysql:mysql-connector-java'
+}
+
+bootJar {
+	manifest {
+		attributes 'Start-Class': 'com.eternus.tomcat.Application'
+	}
+}
+
+docker {
+    name 'jabley/stateless-tomcat:latest'
+    dockerfile file('Dockerfile')
+    // Copy the uber jar to the build context so we can COPY it into the image
+    files tasks.bootJar.outputs
+}
