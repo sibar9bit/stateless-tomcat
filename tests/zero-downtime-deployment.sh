@@ -4,7 +4,7 @@ set -e
 echo_sleep () {
     i=$1
     until [ "$i" -lt 0 ]; do
-        printf '\r%3d' "${i}";
+        printf '\rWaiting ... %3d' "${i}";
         sleep 1;
         i=$((i-1))
     done
