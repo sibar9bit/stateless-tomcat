@@ -8,6 +8,7 @@ echo_sleep () {
         sleep 1;
         i=$((i-1))
     done
+    printf '\r\n';
 }
 
 echo "ensuring we have a clean environment"
@@ -42,7 +43,7 @@ docker-compose stop app_2
 docker-compose stop app_3
 
 echo "Sleep long enough for all of the sessions expire"
-echo_sleep 120
+echo_sleep 60
 
 echo "Starting the app servers back up"
 docker-compose up -d app_1
@@ -52,6 +53,29 @@ docker-compose up -d app_3
 echo "Sleep to let the apps start up"
 echo_sleep 30
 
-# Check that the logs show that the object was cleaned afer the restart
-echo "tail the logs to see the session expiry / object unbound events happen"
-docker-compose logs -f
+echo "Checking the session expiry / object unbound events happen"
+
+logs_pipe=$(mktemp -u)
+mkfifo "${logs_pipe}"
+
+docker-compose logs -f > "${logs_pipe}" &
+LOG_PID=$!
+
+cleanup() {
+    kill "${LOG_PID}" > /dev/null 2>&1
+    rm "${logs_pipe}"
+}
+
+trap cleanup 0 1 2
+
+DESTROYED_COUNT=0
+
+while read -r line; do
+    echo "${line}"
+    if [ "$(echo "${line}" | grep -c 'Unbound CleanupObject')" = "1" ]; then
+        DESTROYED_COUNT=$((DESTROYED_COUNT+1))
+        if [ "${DESTROYED_COUNT}" = "20" ]; then
+            break
+        fi
+    fi
+done < "${logs_pipe}"
