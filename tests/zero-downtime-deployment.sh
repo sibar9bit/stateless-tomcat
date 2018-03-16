@@ -1,15 +1,10 @@
-#! /bin/bash
+#! /bin/sh
 set -e
+set +m
 
-echo_sleep () {
-    i=$1
-    until [ "$i" -lt 0 ]; do
-        printf '\rWaiting ... %3d' "${i}";
-        sleep 1;
-        i=$((i-1))
-    done
-    printf '\r\n';
-}
+curdir=$(dirname "${0}")
+# shellcheck source=./utils.sh
+. "${curdir}/utils.sh"
 
 echo "ensuring we have a clean environment"
 
@@ -19,16 +14,20 @@ docker-compose rm -v -f
 echo "Starting a clean environment"
 docker-compose up -d
 
-echo_sleep 30
+poll_logs 'Catalina.start Server startup' 3
 
-docker-compose logs --tail=10 app_1
-docker-compose logs --tail=10 app_2
-docker-compose logs --tail=10 app_3
+echo "everything looks up, testing"
+echo_sleep 3
 
 # Create a session
 COOKIE_FILE=cookies.txt
 curl -I -c "${COOKIE_FILE}" http://localhost
-trap 'rm -rf "./${COOKIE_FILE}"' 0 1 2
+
+cleanup() {
+    rm -rf "./${COOKIE_FILE}"
+}
+
+trap cleanup 0 1 2
 
 # store the session
 SESSIONID=$(grep JSESSIONID "${COOKIE_FILE}" | awk '/./ { print $NF }')
@@ -59,8 +58,9 @@ redeploy() {
     echo_sleep 5
     echo "start ${app}"
     docker-compose up -d "${app}"
-    echo_sleep 10
-    docker-compose logs --tail 10 "${app}"
+    poll_logs 'Catalina.start Server startup' 1
+    # poll_logs resets traps so we need to add this back. Time to rewrite in Go?
+    trap cleanup 0 1 2
 }
 
 redeploy app_1
@@ -75,6 +75,11 @@ make_another_request
 # what if we sleep, then do another request? One app instance will have a more recently-accessed
 # session. Will the other 2 instances also pick that up, or might one instance expire the session
 # and prematurely log someone out?
+
+# Tomcat PersistentValve handles that by having a list of active sessions. After each request,
+# the session is stored in the persisent store and removed from the list of active sessions
+# for that Tomcat. It thus becomes ineligible for being expired by that instance. Expiry will be
+# detected if a subsequent request is made after the session has expired.
 
 echo_sleep 50
 
