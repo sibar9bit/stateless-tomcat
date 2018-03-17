@@ -21,12 +21,12 @@ poll_logs() {
     docker-compose logs -f --tail="0" > "${logs_pipe}" &
     LOG_PID=$!
 
-    cleanup() {
+    cleanup_pipe() {
         kill "${LOG_PID}" > /dev/null 2>&1
         rm "${logs_pipe}"
     }
 
-    trap cleanup 0 1 2
+    trap cleanup_pipe 0 1 2
 
     MATCHING_COUNT=0
     while read -r line; do
@@ -39,7 +39,7 @@ poll_logs() {
         fi
     done < "${logs_pipe}"
 
-    cleanup
+    cleanup_pipe
 
     trap - 0 1 2
 }

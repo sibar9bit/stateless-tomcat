@@ -24,7 +24,7 @@ COOKIE_FILE=cookies.txt
 curl -I -c "${COOKIE_FILE}" http://localhost
 
 cleanup() {
-    rm -rf "./${COOKIE_FILE}"
+    rm "${COOKIE_FILE}"
 }
 
 trap cleanup 0 1 2
