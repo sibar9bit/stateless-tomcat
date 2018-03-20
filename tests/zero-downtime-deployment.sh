@@ -41,7 +41,7 @@ make_another_request() {
     fi
 }
 
-# Show the same session is used by as the load-balancer round-robins requests
+# Show the same session is used by the client as the load-balancer round-robins requests
 make_another_request
 make_another_request
 make_another_request

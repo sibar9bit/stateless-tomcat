@@ -1,4 +1,4 @@
-Showing how externalisising the HTTP Servlet session into a database can work.
+Showing how externalising the HTTP Servlet session into a database can work.
 
 Getting started
 ===============
