@@ -13,7 +13,7 @@ import java.lang.invoke.MethodHandles;
  */
 public class CleanupObject implements HttpSessionBindingListener, Serializable {
 
-    private static long serialVersionUID = 23213349L;
+    private static final long serialVersionUID = 23213349L;
 
     private static final Log logger = LogFactory.getLog(MethodHandles.lookup().lookupClass());
 
