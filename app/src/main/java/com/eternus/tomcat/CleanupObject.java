@@ -17,13 +17,24 @@ public class CleanupObject implements HttpSessionBindingListener, Serializable {
 
     private static final Log logger = LogFactory.getLog(MethodHandles.lookup().lookupClass());
 
+    private String id;
+
+    CleanupObject(String id) {
+        this.id = id;
+    }
+
     @Override
     public void valueBound(HttpSessionBindingEvent event) {
-        logger.info("Bound CleanupObject (created session)");
+        logger.info(String.format("Bound CleanupObject %s (created session)", event.getValue().toString()));
     }
 
     @Override
     public void valueUnbound(HttpSessionBindingEvent event) {
-        logger.info("Unbound CleanupObject (session expired)");
+        logger.info(String.format("Unbound CleanupObject %s (session expired)", event.getValue().toString()));
+    }
+
+    @Override
+    public String toString() {
+        return this.id;
     }
 }

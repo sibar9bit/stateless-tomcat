@@ -14,7 +14,7 @@ public class HelloController {
     @RequestMapping("/")
     String index(HttpSession session) {
         if (session.getAttribute(MY_USER_SESSION) == null) {
-            session.setAttribute(MY_USER_SESSION, new CleanupObject());
+            session.setAttribute(MY_USER_SESSION, new CleanupObject(session.getId()));
         }
         return session.getId();
     }
