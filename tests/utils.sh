@@ -1,6 +1,16 @@
 #!/bin/sh
 set +m
 
+# Vanilla Tomcat says:
+# "Catalina.start Server startup"
+
+# Spring Boot with embedded Tomcat says:
+# "Started Application in "
+
+# So we pass this into poll_logs and use the -E flag to grep(1)
+# shellcheck disable=SC2034
+STARTUP_REGEX='Catalina.start Server startup|Started Application in '
+
 echo_sleep () {
     i=$1
     until [ "$i" -lt 0 ]; do
@@ -31,7 +41,7 @@ poll_logs() {
     MATCHING_COUNT=0
     while read -r line; do
         echo "${line}"
-        if [ "$(echo "${line}" | grep -c "${search}")" = "1" ]; then
+        if [ "$(echo "${line}" | grep -c -E "${search}")" = "1" ]; then
             MATCHING_COUNT=$((MATCHING_COUNT+1))
             if [ "${MATCHING_COUNT}" = "${count}" ]; then
                 break

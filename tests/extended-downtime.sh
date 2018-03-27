@@ -14,7 +14,7 @@ docker-compose rm -v -f
 echo "Starting a clean environment"
 docker-compose up -d
 
-poll_logs 'Catalina.start Server startup' 3
+poll_logs "${STARTUP_REGEX}" 3
 
 # create 20 sessions
 COUNTER=20
@@ -41,7 +41,7 @@ docker-compose up -d app_1
 docker-compose up -d app_2
 docker-compose up -d app_3
 
-poll_logs 'Catalina.start Server startup' 3
+poll_logs "${STARTUP_REGEX}" 3
 
 echo "Checking the session expiry / object unbound events happen"
 

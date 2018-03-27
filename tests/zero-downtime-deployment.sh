@@ -14,7 +14,7 @@ docker-compose rm -v -f
 echo "Starting a clean environment"
 docker-compose up -d
 
-poll_logs 'Catalina.start Server startup' 3
+poll_logs "${STARTUP_REGEX}" 3
 
 echo "everything looks up, testing"
 echo_sleep 3
@@ -29,14 +29,20 @@ cleanup() {
 
 trap cleanup 0 1 2
 
-# store the session
-SESSIONID=$(grep JSESSIONID "${COOKIE_FILE}" | awk '/./ { print $NF }')
+# store the initial session ID to check whether we use the same sesssion all the time.
+#
+# * Vanilla Tomcat uses JSESSIONID
+# * Spring Boot session with JDBC uses SESSION
+#
+# SESSION is common and sufficiently unique.
+SESSIONID=$(grep SESSION "${COOKIE_FILE}" | awk '/./ { print $NF }')
 
 make_another_request() {
     curl -I -b "${COOKIE_FILE}" -c "${COOKIE_FILE}" http://localhost
     # check the session cookie hasn't changed
     if [ "$(grep -c "${SESSIONID}" "${COOKIE_FILE}")" -ne "1" ]; then
         echo "session cookie has changed!"
+        echo "Expected: ${SESSIONID} but was: $(cat ${COOKIE_FILE})"
         exit 1
     fi
 }
@@ -58,7 +64,7 @@ redeploy() {
     echo_sleep 5
     echo "start ${app}"
     docker-compose up -d "${app}"
-    poll_logs 'Catalina.start Server startup' 1
+    poll_logs "${STARTUP_REGEX}" 1
     # poll_logs resets traps so we need to add this back. Time to rewrite in Go?
     trap cleanup 0 1 2
 }
