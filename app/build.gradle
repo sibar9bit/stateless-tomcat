@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'war'
     id 'org.springframework.boot' version '2.0.0.RELEASE'
     id 'io.spring.dependency-management' version '1.0.4.RELEASE'
     id "com.palantir.docker" version "0.19.2"
@@ -9,22 +10,25 @@ repositories {
     jcenter()
 }
 
+configurations.create("tomcatLib")
+
 dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web'
-    compile 'org.springframework.session:spring-session-jdbc'
-    compile 'org.springframework.boot:spring-boot-starter-jdbc'
-    compile 'mysql:mysql-connector-java'
+    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+    tomcatLib 'mysql:mysql-connector-java:5.1.30'
 }
 
-bootJar {
-	manifest {
-		attributes 'Start-Class': 'com.eternus.tomcat.Application'
-	}
-}
 
 docker {
-    name 'jabley/stateless-tomcat:latest'
+    name 'jabley/stateless-tomcat:standalone'
     dockerfile file('Dockerfile')
-    // Copy the uber jar to the build context so we can COPY it into the image
-    files tasks.bootJar.outputs
+    // Copy the war to the build context so we can COPY it into the image
+    files tasks.bootWar.outputs
+    // Copy MySQL driver so that the Tomcat PersistentManager can access the DB
+    files configurations.tomcatLib
+    // Copy
+    // * web.xml to give 1 minute session timeout
+    // * context.xml for PersitentManager configuration
+    // * logging.properties for session FINE logging
+    files file('./conf/web.xml'), file('./conf/context.xml'), file('./conf/logging.properties')
 }

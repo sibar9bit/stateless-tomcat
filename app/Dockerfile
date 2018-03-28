@@ -1,5 +1,8 @@
-FROM openjdk:8u92-jre-alpine
+FROM tomcat:8.5.28-jre8
 
-ENTRYPOINT ["java", "-jar", "/app/stateless-tomcat.jar"]
+# Remove these for a faster startup
+RUN rm -rf /usr/local/tomcat/webapps/*
 
-COPY ["stateless-tomcat.jar", "/app/"]
+COPY ["web.xml", "context.xml", "logging.properties", "/usr/local/tomcat/conf/"]
+COPY ["stateless-tomcat.war", "/usr/local/tomcat/webapps/"]
+COPY ["mysql-connector-java-*.jar", "/usr/local/tomcat/lib/"]

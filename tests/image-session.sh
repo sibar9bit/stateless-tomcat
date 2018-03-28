@@ -8,7 +8,7 @@ curdir=$(dirname "${0}")
 
 bring_up_env
 
-# Create a session
+# Create a session. This is the first write to the session store
 COOKIE_FILE=cookies.txt
 curl -I -c "${COOKIE_FILE}" http://localhost
 
@@ -37,16 +37,19 @@ make_another_request() {
 }
 
 # Show the same session is used by the client as the load-balancer round-robins requests
+# 2nd write to the session store
 make_another_request
+# 3rd write to the session store
 make_another_request
 
 
 echo "check the logs to see if requesting an image causes a session to be loaded"
 
+# 4th write to the session store?
 curl -I -b "${COOKIE_FILE}" -c "${COOKIE_FILE}" http://localhost/1x1.gif
 
 echo "Another image request but without a session cookie to simulate a cookie-less domain"
 
 curl -I http://localhost/1x1.gif
 
-docker-compose logs | grep SESSION_LOGGER
+docker-compose logs | grep -E 'SESSION_LOGGER|storing session'
