@@ -6,18 +6,7 @@ curdir=$(dirname "${0}")
 # shellcheck source=./utils.sh
 . "${curdir}/utils.sh"
 
-echo "ensuring we have a clean environment"
-
-docker-compose down
-docker-compose rm -v -f
-
-echo "Starting a clean environment"
-docker-compose up -d
-
-poll_logs "${STARTUP_REGEX}" 3
-
-echo "everything looks up, testing"
-echo_sleep 3
+bring_up_env
 
 # Create a session
 COOKIE_FILE=cookies.txt

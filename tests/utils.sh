@@ -8,8 +8,22 @@ set +m
 # "Started Application in "
 
 # So we pass this into poll_logs and use the -E flag to grep(1)
-# shellcheck disable=SC2034
 STARTUP_REGEX='Catalina.start Server startup|Started Application in '
+
+bring_up_env() {
+    echo "ensuring we have a clean environment"
+
+    docker-compose down
+    docker-compose rm -v -f
+
+    echo "Starting a clean environment"
+    docker-compose up -d
+
+    poll_logs "${STARTUP_REGEX}" 3
+
+    echo "everything looks up, testing"
+    echo_sleep 3
+}
 
 echo_sleep () {
     i=$1

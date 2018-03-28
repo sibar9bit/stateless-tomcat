@@ -6,15 +6,7 @@ curdir=$(dirname "${0}")
 # shellcheck source=./utils.sh
 . "${curdir}/utils.sh"
 
-echo "ensuring we have a clean environment"
-
-docker-compose down
-docker-compose rm -v -f
-
-echo "Starting a clean environment"
-docker-compose up -d
-
-poll_logs "${STARTUP_REGEX}" 3
+bring_up_env
 
 # create 20 sessions
 COUNTER=20
