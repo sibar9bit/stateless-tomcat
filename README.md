@@ -43,6 +43,18 @@ extended downtime
 1. stop all of the `app_x` instances to simulate extended downtime of the application / segfaults
 1. wait for 2 minutes (session timeout is 1 minute)
 1. start one or more of the `app_x` instances
-1. after a minute or so, you should see valueUnbound events in the logs as CleanupObjects are purged 
- 
+1. after a minute or so, you should see valueUnbound events in the logs as CleanupObjects are purged
+
 See [extended-downtime.sh](tests/extended-downtime.sh).
+
+image session
+-------------
+
+1. have a client access the site a few times
+1. only a single session should be created
+1. request the image using the client session
+    1. is the session loaded from the DB?
+1. request the image using no session cookie (replicating a cookie-less domain)
+    1. is the session loaded from the DB?
+
+See [image-session.sh](tests/image-session.sh).
