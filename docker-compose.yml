@@ -1,44 +1,48 @@
-db:
-  image: mysql:5.7.21
-  environment:
-    MYSQL_ROOT_PASSWORD: strong-passw0rd
-    MYSQL_DATABASE: myapp
-    MYSQL_USER: myapp_user
-    MYSQL_PASSWORD: myapp_pass
-  volumes:
-    - "./mysql:/docker-entrypoint-initdb.d"
-  ports:
-    - 3306:3306
+version: "3"
 
-app_1:
-  image: jabley/stateless-tomcat:standalone
-  ports:
-    - "8081:8080"
-  links:
-    - db
+services:
+  db:
+    image: mysql:5.7.21
+    environment:
+      MYSQL_ROOT_PASSWORD: strong-passw0rd
+      MYSQL_DATABASE: myapp
+      MYSQL_USER: myapp_user
+      MYSQL_PASSWORD: myapp_pass
+    volumes:
+      - "./mysql:/docker-entrypoint-initdb.d"
+    ports:
+      - 3306:3306
+    command: ['--max_allowed_packet=16M']
 
-app_2:
-  image: jabley/stateless-tomcat:standalone
-  ports:
-    - "8082:8080"
-  links:
-    - db
+  app_1:
+    image: jabley/stateless-tomcat:standalone
+    ports:
+      - "8081:8080"
+    links:
+      - db
 
-app_3:
-  image: jabley/stateless-tomcat:standalone
-  ports:
-    - "8083:8080"
-  links:
-    - db
-    
-# haproxy container that automatically creates a load balancer / reverse proxy across the 3 instances of the app
-haproxy:
-  image: haproxy:1.8.4
-  ports:
-    - "80:80"
-  volumes:
-    - "./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg"
-  links:
-    - app_1
-    - app_2
-    - app_3
+  app_2:
+    image: jabley/stateless-tomcat:standalone
+    ports:
+      - "8082:8080"
+    links:
+      - db
+
+  app_3:
+    image: jabley/stateless-tomcat:standalone
+    ports:
+      - "8083:8080"
+    links:
+      - db
+
+  # haproxy container that automatically creates a load balancer / reverse proxy across the 3 instances of the app
+  haproxy:
+    image: haproxy:1.8.4
+    ports:
+      - "80:80"
+    volumes:
+      - "./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg"
+    links:
+      - app_1
+      - app_2
+      - app_3
