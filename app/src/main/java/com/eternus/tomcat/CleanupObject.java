@@ -19,8 +19,11 @@ public class CleanupObject implements HttpSessionBindingListener, Serializable {
 
     private String id;
 
-    CleanupObject(String id) {
+    private byte[] body;
+
+    CleanupObject(String id, int size) {
         this.id = id;
+        this.body = DevURandom.readRandom(size);
     }
 
     @Override
@@ -35,6 +38,6 @@ public class CleanupObject implements HttpSessionBindingListener, Serializable {
 
     @Override
     public String toString() {
-        return this.id;
+        return String.format("%s, %d bytes", this.id, this.body == null ? 0 : this.body.length);
     }
 }
