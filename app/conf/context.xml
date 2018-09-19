@@ -39,4 +39,11 @@
                 sessionMaxInactiveCol="max_inactive"
         />
     </Manager>
+
+    <Realm className="org.apache.catalina.realm.JAASRealm"
+           appName="lscCommonAuth"
+           userClassNames="com.eternus.login.NewOraJAASPrincipal"
+           roleClassNames="com.eternus.login.NewOraJAASPrincipal"
+           configFile="jaas.config"
+    />
 </Context>

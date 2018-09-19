@@ -35,7 +35,7 @@ app_3:
 haproxy:
   image: haproxy:1.8.4
   ports:
-    - "80:80"
+    - "81:80"
   volumes:
     - "./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg"
   links:
