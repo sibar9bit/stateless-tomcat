@@ -17,7 +17,9 @@ public class HelloController {
 
     @RequestMapping("/")
     String index(HttpSession session) {
+        System.out.println("------->index");
         if (session.getAttribute(MY_USER_SESSION) == null) {
+            System.out.println("------->null and created");
             session.setAttribute(MY_USER_SESSION, new CleanupObject(session.getId()));
         }
         return session.getId();
@@ -25,6 +27,7 @@ public class HelloController {
 
     @RequestMapping("/protected.do")
     String protectedPage(HttpSession session) {
+        System.out.println("protected page");
         if (session.getAttribute(MY_USER_SESSION) == null) {
             session.setAttribute(MY_USER_SESSION, new CleanupObject(session.getId()));
         }
@@ -38,6 +41,7 @@ public class HelloController {
      */
     @RequestMapping("/login")
     ModelAndView login(ModelMap model, HttpSession session) {
+        System.out.println("Login");
         processResponse(session);
         return new ModelAndView("forward:/ssoLogin.jsp", model);
     }

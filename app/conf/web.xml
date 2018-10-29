@@ -592,14 +592,9 @@
     <!-- You can set the default session timeout (in minutes) for all newly   -->
     <!-- created sessions by modifying the value below.                       -->
 
-    <session-config>
-        <session-timeout>1</session-timeout>
-    </session-config>
-
 
     <security-role>
-        <description/>
-        <role-name>ROLE_USER</role-name>
+        <role-name>user</role-name>
     </security-role>
 
     <security-constraint>
@@ -615,21 +610,22 @@
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>wrc-protected</web-resource-name>
-            <url-pattern>/protected.do</url-pattern>
+            <url-pattern>/stateless-tomcat/protected.do</url-pattern>
         </web-resource-collection>
         <auth-constraint>
-            <role-name>ROLE_USER</role-name>
+            <role-name>user</role-name>
         </auth-constraint>
     </security-constraint>
 
     <login-config>
-        <auth-method>FORM</auth-method>
-        <realm-name>lscCommonAuth</realm-name>
-        <form-login-config>
-            <form-login-page>/login.jsp</form-login-page>
-            <form-error-page>/AccessDenied.jsp</form-error-page>
-        </form-login-config>
+        <auth-method>KEYCLOAK</auth-method>
+        <realm-name>basic-auth</realm-name>
     </login-config>
+
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+
 
     <!-- ===================== Default MIME Type Mappings =================== -->
     <!-- When serving static resources, Tomcat will automatically generate    -->

@@ -10,12 +10,32 @@ db:
   ports:
     - 3306:3306
 
+keycloak:
+  image: jboss/keycloak
+  volumes:
+    - "./realm-export.json:/tmp/realm-export.json"
+  environment:
+    KEYCLOAK_USER: root
+    KEYCLOAK_PASSWORD: root
+    KEYCLOAK_IMPORT: /tmp/realm-export.json
+  ports: 
+    - "8081:8080"
+
 app_1:
   image: jabley/stateless-tomcat:standalone
+  environment:
+      CATALINA_OPTS : >
+        -Dconnector.scheme=http
+        -Dconnector.proxy.port=8081
+        -Dconnector.secure=false
+        -Dserver.port=8081
   ports:
-    - "8081:8080"
+    - "8080:8080"
   links:
     - db
+    - keycloak
+  volumes:
+    - "./lib:/usr/local/tomcat/lib"
 
 app_2:
   image: jabley/stateless-tomcat:standalone
@@ -23,6 +43,9 @@ app_2:
     - "8082:8080"
   links:
     - db
+    - keycloak
+  volumes:
+    - "./lib:/usr/local/tomcat/lib"
 
 app_3:
   image: jabley/stateless-tomcat:standalone
@@ -30,6 +53,9 @@ app_3:
     - "8083:8080"
   links:
     - db
+    - keycloak
+  volumes:
+    - "./lib:/usr/local/tomcat/lib"
     
 # haproxy container that automatically creates a load balancer / reverse proxy across the 3 instances of the app
 haproxy:
@@ -42,3 +68,4 @@ haproxy:
     - app_1
     - app_2
     - app_3
+    - keycloak

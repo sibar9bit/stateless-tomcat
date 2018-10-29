@@ -23,27 +23,5 @@
     <WatchedResource>WEB-INF/web.xml</WatchedResource>
     <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
 
-    <Valve className="org.apache.catalina.valves.PersistentValve"/>
-
-    <Manager className="org.apache.catalina.session.PersistentManager">
-        <Store
-                className="org.apache.catalina.session.JDBCStore"
-                connectionName="myapp_user"
-                connectionPassword="myapp_pass"
-                connectionURL="jdbc:mysql://db:3306/myapp?useSSL=false"
-                driverName="com.mysql.jdbc.Driver"
-                localDataSource="true"
-                sessionTable="tomcat_sessions"
-                sessionAppCol="app_name"
-                sessionLastAccessedCol="last_accessed"
-                sessionMaxInactiveCol="max_inactive"
-        />
-    </Manager>
-
-    <Realm className="org.apache.catalina.realm.JAASRealm"
-           appName="lscCommonAuth"
-           userClassNames="com.eternus.login.NewOraJAASPrincipal"
-           roleClassNames="com.eternus.login.NewOraJAASPrincipal"
-           configFile="jaas.config"
-    />
+    <Valve className="org.keycloak.adapters.tomcat.KeycloakAuthenticatorValve"/>
 </Context>
