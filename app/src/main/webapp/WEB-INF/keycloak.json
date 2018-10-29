@@ -1,0 +1,10 @@
+{
+  "realm": "basic-auth",
+  "auth-server-url": "http://localhost:8081/auth",
+  "ssl-required": "external",
+  "resource": "basic-auth-service",
+  "credentials": {
+    "secret": "3a76f62c-d8ec-4409-b678-1c680750575b"
+  },
+  "confidential-port": 0
+}
