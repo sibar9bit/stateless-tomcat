@@ -22,8 +22,9 @@
     <!-- web application will be reloaded.                                   -->
     <WatchedResource>WEB-INF/web.xml</WatchedResource>
     <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
-
+    
     <Valve className="org.apache.catalina.valves.PersistentValve"/>
+    <Valve className="org.apache.catalina.authenticator.FormAuthenticator"/>
 
     <Manager className="org.apache.catalina.session.PersistentManager">
         <Store
